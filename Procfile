@@ -1,1 +1,1 @@
-web: node nes.js
+web: node nes.js --port=$PORT
