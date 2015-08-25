@@ -65,16 +65,22 @@ app.get('/gifs/nes.gif', function (req, res) {
   var gif = new GifEncoder(256, 240);
   // Collect output
 
-  gif.createReadStream().pipe(res, {autoClose: false});
+  var stream = gif.createReadStream().pipe(res, {autoClose: false});
 
   gif.setQuality(20); // image quality. 10 is default.
   gif.setRepeat(-1);   // 0 for repeat, -1 for no-repeat
+  gif.setDelay(1);   // 0 for repeat, -1 for no-repeat
 
   gif.start(canvas);
 
-  setInterval(function(){
+  var interval = setInterval(function(){
     gif.addFrame(canvas.getContext('2d'));
-  },500);
+  },250);
+
+  req.on('close', function(){
+    stream.destroy();
+    clearInterval(interval);
+  })
 
 });
 
