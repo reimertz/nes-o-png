@@ -1,0 +1,57 @@
+html
+  head
+    style.
+      .gif {
+        width:500px;
+        height:500px;
+        margin: 0;
+        padding: 0;
+        font-size: 0;
+        position: relative;
+      }
+
+      .control-pixels {
+        position: absolute;
+        top: 0;
+        width:500px;
+        height:500px;
+      }
+
+      form {
+        float: left;
+        display: inline;
+        width: 4px;
+        height: 4px;
+        border: none;
+        font-size: 0;
+        line-height: 4;
+        outline: none;
+      }
+      form button {
+        display: inline;
+        width: 4px;
+        height: 4px;
+        border: none;
+        font-size: 0;
+        line-height: 4;
+        outline: none;
+        opacity: 0;
+      }
+
+      iframe {
+
+      }
+
+  body
+    div.gif
+      img(src="/gifs/#{id}.gif" width="500" height="500")
+      div.control-pixels
+        - for (var y = 0; y < 125; y++)
+          - for (var x = 0; x < 125; x++)
+            form(action="/input" target="post-iframe" method="POST")
+              input(type="hidden" name="id" value="#{id}")
+              input(type="hidden" name="x" value="#{x}")
+              input(type="hidden" name="y" value="#{y}")
+              button(type="submit")
+
+    iframe(name="post-iframe" src="/input")

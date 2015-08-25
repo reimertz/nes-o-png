@@ -1,0 +1,22 @@
+{
+  "name": "zelda-gif-no-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "canvas": "^1.2.7",
+    "express": "^4.13.3",
+    "gameboy": "^0.2.0",
+    "gif-encoder": "^0.4.1",
+    "gifencoder": "^1.0.6",
+    "jade": "^1.11.0",
+    "nesnes": "^0.1.1",
+    "node-nes": "^0.1.1"
+  }
+}
