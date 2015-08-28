@@ -1,135 +1,137 @@
 var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
+    app = express(),
 
-var util = require('util');
+    crypto = require('crypto'),
+    fs = require('fs'),
+    shortid = require('shortid'),
+    util = require('util'),
+
+    JSNES = require('node-nes')({}),
+
+    latestHash = '',
+    requestHistory = [];
 
 app.set('view engine', 'jade');
-app.use(bodyParser.urlencoded({ extended: false }))
+app.set('port', (process.env.PORT || 7331));
 
+app.get('/', function (req, res) {
+  if(req.url === 'favicon.ico') res.end();
+  var id = shortid.generate();
 
-//var GifEncoder = require('gif-encoder');
-var GifEncoder = require('gifencoder');
-var Canvas = require('canvas');
-var fs = require('fs');
+  requestHistory[id] = null;
 
-// use node-canvas
-var canvas = new Canvas(320, 240);
-var ctx = canvas.getContext('2d');
-
-var userArray = [];
-
-app.post('/input', function (req, res) {
-  var id = req.body.id;
-
-  if(!userArray[id]) {
-    res.send('id doesn\'t exist');
-    return;
-  }
-
-  userArray[id].x = req.body.x;
-  userArray[id].y = req.body.y;
-
-  doPaint(userArray[id]);
-
-  res.send('id:' + req.body.id + ' (x:' + req.body.x + ', y:' + req.body.y);
+  res.render('index', {id: id});
 });
 
+app.get('/input/:code', function (req, res) {
+  res.end();
+
+  var buttonCode = req.params.code;
+
+  JSNES.keyboard.setKey(parseInt(buttonCode), 0x41);
+
+  setTimeout(function(){
+    JSNES.keyboard.setKey(parseInt(buttonCode), 0x40);
+  }, 100);
+});
 
 app.get('/input', function (req, res) {
   res.end();
 });
 
-app.get('/:id', function (req, res) {
-  if(req.url === 'favicon.ico') res.end();
+app.get('/stream.png/:id', function (req, res) {
+  var id = req.params.id,
+      retries = 0;
 
-  var id = req.params.id;
+  res.header('Refresh', '0');
 
-  if(!userArray[id]) {
+  var i = setInterval(function(){
+    retries += 1;
+    if (retries++ <= 500 && requestHistory[id] === latestHash) return;
 
-    userArray[id] = {
-      id: id,
-      x: 0,
-      y: 0
-    };
-  }
+    var readStream = fs.createReadStream('stream.png');
 
-  res.render('index', {id:id});
+    clearInterval(i);
+
+    requestHistory[id] = latestHash;
+
+    readStream.on('data', function(chunk){
+      res.write(chunk);
+    })
+
+    readStream.on('end', function(){
+      setTimeout(function(){
+        res.end();
+        readStream.destroy();
+      }, 100);
+
+    });
+  },100);
+
+  // }
+  // else {
+  //   setTimeout(function(){
+  //     res.header('Refresh', '0');
+  //     res.status(304);
+  //     res.end();
+  //   }, 100);
+  // }
 });
 
 
-app.get('/gifs/:id.gif', function (req, res) {
-  var id = req.params.id;
-  res.header('Content-Type', 'image/gif');
+function saveFrame(){
+  var pngStream = JSNES.ui.screen[0].pngStream(),
+      writeStream = fs.createWriteStream('stream.png'),
+      hash = crypto.createHash('md5')
 
-  // /fs.createReadStream('gifs/' + id + '.gif', {autoClose: false}).pipe(res, {end:false});
+  pngStream.on('data', function(data){
+    hash.update(data, 'utf8');
+    writeStream.write(data);
+  });
 
-  userArray[id].gif = new GifEncoder(500, 500);
-  // Collect output
+  pngStream.on('end', function(){
+    var newHash = hash.digest('hex');
 
-  var file = fs.createWriteStream('gifs/' + userArray[id].id + '.gif', {end: false});
+    if(newHash !== latestHash){
+      latestHash = newHash;
+    }
 
-  userArray[id].gif.createWriteStream().pipe(file);
-  userArray[id].gif.createReadStream().pipe(res, {autoClose: false});
+    writeStream.end();
+    writeStream.destroy();
+  });
+}
 
-  //fs.createReadStream('gifs/' + id + '.gif', {autoClose: false}).pipe(res, {end:false})
+function saveGameState(options, err) {
+  if (options.cleanup) console.log('clean');
+  if (err) console.log(err.stack);
+  if (options.exit) {
+    fs.writeFile('state.json', JSON.stringify(JSNES.toJSON()) , function (err) {
+      if (err) throw err;
 
-
-  userArray[id].gif.setQuality(20); // image quality. 10 is default.
-  userArray[id].gif.setRepeat(-1);   // 0 for repeat, -1 for no-repeat
-
- // userArray[id].gif.writeHeader();
-  userArray[id].gif.start();
-
-  doPaint(userArray[id]);
-
-});
-
-
-function swapBackground(userObject){
-  var canvas = new Canvas(500, 500);
-  var ctx = canvas.getContext('2d');
-
-    // red rectangle
-  if(Date.now()%2 === 0){
-    ctx.fillStyle = '#ff0000';
-  } else {
-    ctx.fillStyle = '#00ff00';
+      process.exit();
+    });
   }
-
-  ctx.fillRect(0, 0, 500, 500);
-  ctx.fillText("x:" + userObject.x, 50, 100);
-  ctx.fillText("y:" + userObject.y, 50, 300);
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = "bold 24px verdana, sans-serif ";
-
-  userObject.gif.addFrame(ctx);
-  //userObject.gif.addFrame(ctx.getImageData(0, 0, 500, 500).data);
-
 }
 
-function doPaint(userObject){
-  var canvas = new Canvas(500, 500);
-  var ctx = canvas.getContext('2d');
+process.on('exit', saveGameState.bind(null,{cleanup:true}));
+process.on('SIGINT', saveGameState.bind(null, {exit:true}));
+process.on('uncaughtException', saveGameState.bind(null, {exit:true}));
 
-    // red rectangle
-  ctx.fillStyle = '#ff0000';
-  ctx.fillRect(0, 0, 500, 500);
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = "bold 24px verdana, sans-serif ";
-  ctx.fillText("x:" + userObject.x, 50, 100);
-  ctx.fillText("y:" + userObject.y, 50, 300);
-  userObject.gif.addFrame(ctx);
-  //userObject.gif.addFrame(ctx.getImageData(0, 0, 500, 500).data);
-
-}
-
-
-var server = app.listen(3000, function () {
+var server = app.listen(app.get('port'), function () {
   var host = server.address().address;
   var port = server.address().port;
 
+  if (fs.existsSync('state.json')) {
+    JSNES.fromJSON(JSON.parse(fs.readFileSync('state.json')));
+  }
+  else {
+    JSNES.loadRom(fs.readFileSync('roms/zelda.nes', {encoding: 'binary'}));
+  }
+
+  JSNES.start();
+  setInterval(saveFrame, 100);
+
   console.log('Example app listening at http://%s:%s', host, port);
 });
+
+
