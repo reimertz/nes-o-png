@@ -1,49 +1,26 @@
-var express = require('express');
+var JSNES = require('node-nes')(),
+    lastSeenFrameStorage = {},
+    activeUsers = require('./controllers/activeUsers')(),
+    romHandler = require('./controllers/romHandler')(JSNES),
+    streamHandler = require('./controllers/streamHandler')(JSNES, activeUsers),
+
+    express = require('express'),
     app = module.exports.app = exports.app = express(),
     favicon = require('serve-favicon'),
-
-    fs = require('fs'),
-
-    JSNES = require('node-nes')({}),
-    lastSeenFrameStorage = {},
-
-    streamHandler = require('./controllers/streamHandler')(JSNES);
-
+    router = express.Router(), // Create our Express router
+    routes = require('./routes/index')(JSNES, lastSeenFrameStorage, streamHandler);
 
 if(process.env.NODE_ENV === 'dev') {
   app.use(require('connect-livereload')());
 }
 
-var router = express.Router(); // Create our Express router
-var routes = require('./routes/index')(JSNES, lastSeenFrameStorage, streamHandler);  // Load route logic
+router.use('/assets', express.static('./public/assets'));
 
-router.get('/', routes.createUser, routes.dash);
-router.use('/:id/', routes.addUserInfo, express.static('./public'));
-router.get('/:id/stream.png', routes.addUserInfo, routes.stream);
-router.get('/input/:code', routes.input);
-
-
-
-function loadGameState() {
-  if (fs.existsSync('state.json')) {
-    JSNES.fromJSON(JSON.parse(fs.readFileSync('state.json')));
-  }
-  else {
-    JSNES.loadRom(fs.readFileSync(__dirname + '/roms/zelda.nes', {encoding: 'binary'}));
-  }
-}
-
-function saveGameState(options, err) {
-  if (options.cleanup) console.log('clean');
-  if (err) console.log(err.stack);
-  if (options.exit) {
-    fs.writeFile('state.json', JSON.stringify(JSNES.toJSON()) , function (err) {
-      if (err) throw err;
-
-      process.exit();
-    });
-  }
-}
+router.get('/',                     /* Not ratelimited  */                                                            routes.static('/'));
+router.get('/play/',                routes.rateLimit(10, 'minute'),    routes.createUser,                              routes.play);
+router.get('/play/:id/',            /* Not ratelimited  */            routes.addUserInfo,                             routes.static('/play/'));
+router.get('/play/:id/stream.png',  routes.rateLimit(10, 'second'),   routes.addUserInfo,   activeUsers.sniffer,      routes.pngStream);
+router.get('/input/:code',          routes.rateLimit(3, 'second'),    routes.addUserInfo,                             routes.input);
 
 app.set('port', (process.env.PORT || 7331));
 app.use(favicon('./public/favicon.ico'));
@@ -53,13 +30,13 @@ var server = app.listen(app.get('port'), function () {
   var host = server.address().address,
       port = server.address().port;
 
-  loadGameState();
+  romHandler.loadGameState();
   JSNES.start();
   streamHandler.startStream(150);
 
-  process.on('exit', saveGameState.bind(null,{cleanup:true}));
-  process.on('SIGINT', saveGameState.bind(null, {exit:true}));
-  process.on('uncaughtException', saveGameState.bind(null, {exit:true}));
+  process.on('exit', romHandler.saveGameState.bind(null,{cleanup:true}));
+  process.on('SIGINT', romHandler.saveGameState.bind(null, {exit:true}));
+  process.on('uncaughtException', romHandler.saveGameState.bind(null, {exit:true}));
 
   console.log('Example app listening at http://%s:%s', host, port);
 });

@@ -1,0 +1,21 @@
+extends ../base.jade
+
+block content
+  section.screen
+    iframe(src="stream.png" allowtransparency="true" scrolling="no")
+
+  section.controller
+    img(src="/assets/images/controller.png" usemap="#controller-map")
+
+    map#controller-map(name="controller-map")
+      area(href="/input/38" target="post-iframe" shape="rect" coords="34,37,50,51")
+      area(href="/input/37" target="post-iframe" shape="rect" coords="17,53,31,69")
+      area(href="/input/40" target="post-iframe" shape="rect" coords="33,73,49,85")
+      area(href="/input/39" target="post-iframe" shape="rect" coords="52,54,65,69")
+      area(href="/input/17" target="post-iframe" shape="rect" coords="86,66,113,82")
+      area(href="/input/13" target="post-iframe" shape="rect" coords="122,65,149,82")
+      area(href="/input/89" target="post-iframe" shape="rect" coords="166,60,192,87")
+      area(href="/input/88" target="post-iframe" shape="rect" coords="199,59,225,87")
+
+  section.hidden-stuff
+    iframe(name="post-iframe" scrolling="no")

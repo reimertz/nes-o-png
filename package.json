@@ -10,12 +10,11 @@
   "author": "Pierre Reimertz",
   "license": "ISC",
   "dependencies": {
-    "babel": "^5.8.23",
     "body-parser": "^1.13.3",
     "canvas": "^1.2.7",
     "express": "^4.13.3",
-    "gulp-babel": "^5.2.1",
     "jade": "^1.11.0",
+    "limiter": "^1.0.5",
     "memory-streams": "^0.1.0",
     "node-nes": "git://github.com/reimertz/node-nes.git#master",
     "serve-favicon": "^2.3.0",

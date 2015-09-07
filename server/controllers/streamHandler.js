@@ -5,16 +5,24 @@ var exports = {},
     fs = require('fs'),
     crypto = require('crypto');
 
-module.exports = function(JSNES) {
+module.exports = function(JSNES, activeUsers) {
   var timeout = null,
       isStreaming = false,
       stream,
-      lastRenderedFrame = '';
+      lastRenderedFrameHash = '';
 
   function saveFrame(ms) {
-    var pngStream = JSNES.ui.screen[0].pngStream(),
+    var canvas = JSNES.ui.screen[0],
+    //var pngStream = JSNES.ui.screen[0].pngStream(),
         hash = crypto.createHash('md5');
 
+    var ctx = canvas.getContext('2d');
+
+    ctx.font = '10px Impact';
+    ctx.fillStyle = 'white';
+    ctx.fillText(activeUsers.sample() + " player(s)", 5, 15);
+
+    var pngStream = canvas.pngStream();
     stream = new streams.WritableStream();
 
     pngStream.pipe(stream);
@@ -24,10 +32,10 @@ module.exports = function(JSNES) {
     });
 
     pngStream.on('end', function(){
-      var newFrame = hash.digest('hex');
+      var newFrameHash = hash.digest('hex');
 
-      if (newFrame !== lastRenderedFrame) {
-        lastRenderedFrame = newFrame;
+      if (newFrameHash !== lastRenderedFrameHash) {
+        lastRenderedFrameHash = newFrameHash;
       }
 
       timeout = setTimeout(function(){
@@ -51,7 +59,7 @@ module.exports = function(JSNES) {
   }
 
   exports.getLastRenderedFrame = function(){
-    return lastRenderedFrame;
+    return lastRenderedFrameHash;
   }
 
   exports.getLatestPngAsStream = function(){
