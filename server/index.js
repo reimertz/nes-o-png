@@ -19,7 +19,7 @@ router.use('/assets', express.static('./public/assets'));
 router.get(['/', '/*.html'],        /* Not ratelimited  */                                                            routes.static('/'));
 router.get('/play/',                routes.rateLimit(10, 'minute'),   routes.createUser,                              routes.play);
 router.get('/play/:id/',            /* Not ratelimited  */            routes.addUserInfo,                             routes.static('/play/'));
-router.get('/play/:id/stream.png',  routes.rateLimit(10, 'second'),   routes.addUserInfo,   activeUsers.sniffer,      routes.pngStream);
+router.get('/play/:id/stream.png',  routes.rateLimit(100, 'second'),   routes.addUserInfo,   activeUsers.sniffer,      routes.pngStream);
 router.get('/input/:code',          routes.rateLimit(3, 'second'),    routes.addUserInfo,                             routes.input);
 
 app.set('port', (process.env.PORT || 7331));
