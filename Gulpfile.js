@@ -1,5 +1,4 @@
 var gulp = require('gulp'),
-    babel = require("gulp-babel"),
     sass = require('gulp-sass'),
     autoprefixer = require('gulp-autoprefixer'),
     jade = require('gulp-jade'),
@@ -9,7 +8,7 @@ var gulp = require('gulp'),
 gulp.task('server', function () {
   server.run(['server/index.js']);
 
-  gulp.watch('client/views/*.jade', ['templates']);
+  gulp.watch('client/views/**/*.jade', ['templates']);
   gulp.watch('client/scss/*.scss', ['styles']);
 
   gulp.watch('public/**/*.css', server.notify);

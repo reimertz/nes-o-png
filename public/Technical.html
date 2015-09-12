@@ -1,0 +1,19 @@
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+  </head>
+  <body>
+    <h1>Technical</h1>
+    <h2>Server</h2>We use Node.js, a futuristic JavaScript-based server.
+    <h3>png-streams</h3>We pipe the screen of our nes emulator to an png-stream. Each rendered frame is tagged with a unique hash.
+    <h3>Refresh: 0 + long-pulling requests = &lt;3</h3>We utilize a combo of auto-refreshing iframes and long-pulling requests to make sure we only update a clients iframe when
+    a new frame has been rendered. This is done by mapping latest seen frame to each client.
+    <h2>Client</h2>NESoPNG is &lt;noscript>-compliant, meaning that no JavaScript is used at all to render or interact with the game.
+    <h3>Controller</h3>The controller use &lt;map>-element together with &lt;area>-elements to tag areas of the image.
+    Each &lt;area>-element is then is pointed to a hidden iframe
+    so we can send input to the server without refreshing the page.
+    <h2>For further investigation</h2><a href="https://github.com/reimertz/Nintendo-Entertainment-System-over-Portable-Network-Graphics" target="_blank">browse the source-code</a>
+    <h1></h1><a href="/">Go back</a>
+  </body>
+</html>

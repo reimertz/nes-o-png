@@ -56,8 +56,8 @@ module.exports = function(JSNES, lastSeenFrameStorage, streamHandler){
 
   exports.static = function(path) {
     return function(req, res, next) {
-      var params = req.params[0] ? req.params[0] : 'index.html';
-      res.sendfile(path, {root: './public'});
+      var params = req.params[0] ? req.params[0] + '.html' : 'index.html';
+      res.sendfile(path + params, {root: './public'});
     }
   }
 

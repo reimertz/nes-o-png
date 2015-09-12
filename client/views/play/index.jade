@@ -1,12 +1,12 @@
 extends ../base.jade
 
+block vars
+  - var title = "Play";
+
 block content
-  section.screen
-    iframe(src="stream.png" allowtransparency="true" scrolling="no")
-
-  section.controller
+  iframe(src="stream.png" width="256" height="240" allowtransparency="true" scrolling="no")
+  h1
     img(src="/assets/images/controller.png" usemap="#controller-map")
-
     map#controller-map(name="controller-map")
       area(href="/input/38" target="post-iframe" shape="rect" coords="34,37,50,51")
       area(href="/input/37" target="post-iframe" shape="rect" coords="17,53,31,69")
@@ -16,6 +16,17 @@ block content
       area(href="/input/13" target="post-iframe" shape="rect" coords="122,65,149,82")
       area(href="/input/89" target="post-iframe" shape="rect" coords="166,60,192,87")
       area(href="/input/88" target="post-iframe" shape="rect" coords="199,59,225,87")
+  iframe(name="post-iframe" scrolling="no" width="0" height="0")
 
-  section.hidden-stuff
-    iframe(name="post-iframe" scrolling="no")
+  h2="Screen"
+  | If screen changes without your interaction, don't be afraid! It means that someone
+  | else in the world is playing together with you. If you ar curious how many you play together
+  | with, just look in the top-left corner.
+  h2="Controller"
+  | Just press the any of the buttons on the controller to interact with the game, just like you would
+  | do if you had the controller in your hand.
+  ul
+    li="ARROWS - move the character"
+    li="SELECT - pause/unpause the game, menu selection"
+    li="START  - menu"
+    li="A/B  - action buttons"

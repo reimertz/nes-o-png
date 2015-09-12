@@ -1,0 +1,26 @@
+extends ./base.jade
+
+block vars
+  - var title = "Technical";
+
+block content
+  h2="Server"
+  | We use Node.js, a futuristic JavaScript-based server.
+  h3="png-streams"
+  | We pipe the screen of our nes emulator to an png-stream. Each rendered frame is tagged with a unique hash.
+  h3="Refresh: 0 + long-pulling requests = <3"
+  | We utilize a combo of auto-refreshing iframes and long-pulling requests to make sure we only update a clients iframe when
+  | a new frame has been rendered. This is done by mapping latest seen frame to each client.
+
+  h2="Client"
+  |NESoPNG is &lt;noscript>-compliant, meaning that no JavaScript is used at all to render or interact with the game.
+
+  h3="Controller"
+  |The controller use &lt;map>-element together with &lt;area>-elements to tag areas of the image.
+  |Each &lt;area>-element is then is pointed to a hidden iframe
+  |so we can send input to the server without refreshing the page.
+
+  h2="For further investigation"
+  a(href="https://github.com/reimertz/Nintendo-Entertainment-System-over-Portable-Network-Graphics" target="_blank")="browse the source-code"
+
+

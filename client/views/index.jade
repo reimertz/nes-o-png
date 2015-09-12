@@ -1,11 +1,33 @@
 extends ./base.jade
 
-block content
-  section.presentation
-        h1="png-streams - A hack for the 90's"
-        h2="A <noscript> compatible version of Legend of Zelda"
-        h2="that you can play online with your friends, mmorpg-style!"
+block vars
+  - var title = "Nintendo Entertainment System over Portable Network Graphics";
+  - var isHome = true;
 
-      section.lets-play
-        a(href="/play")
-          img(src="/assets/images/letsplay.png")
+block content
+  | Nintendo Entertainment System over Portable Network Graphics (NESoPNG) let's
+  | you play games together with other people on the World Wide Web and doesn't require
+  | JavaScript.
+
+  dl
+    td
+      a(href="/Play")="Play now"
+    dd="with people from all over the world!"
+    td
+      a(href="/Technical.html")="Technical"
+    dd="Details of protocols, formats, program internals etc"
+    td
+    td
+      a(href="/People.html")="People"
+    dd="A list of some people involved in the project."
+    td
+      a(href="https://github.com/reimertz/Nintendo-Entertainment-System-over-Portable-Network-Graphics" target="_blank")="How can I help?"
+    dd="If you would like to support the NESoPNG programme"
+    td
+      a(href="https://github.com/reimertz/Nintendo-Entertainment-System-over-Portable-Network-Graphics" target="_blank")="Getting code"
+    dd="Getting the code by anonymous FTP , etc."
+    td
+      a(href="/SayWhat.html")="Say what?"
+    dd="why does this page look like shit?"
+
+

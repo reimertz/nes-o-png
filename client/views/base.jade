@@ -1,6 +1,11 @@
+block vars
+
 html
   head
-    link(rel="stylesheet" type="text/css" href="/assets/css/stylesheet.css")
     meta(name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;")
   body
+    h1=title
     block content
+    if(!isHome)
+      h1
+      a(href="/")="Go back"

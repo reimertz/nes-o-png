@@ -1,14 +1,12 @@
 
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="/assets/css/stylesheet.css"/>
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
   </head>
   <body>
-    <section class="screen">
-      <iframe src="stream.png" allowtransparency="true" scrolling="no"></iframe>
-    </section>
-    <section class="controller"><img src="/assets/images/controller.png" usemap="#controller-map"/><map id="controller-map" name="controller-map">
+    <h1>Play</h1>
+    <iframe src="stream.png" width="256" height="240" allowtransparency="true" scrolling="no"></iframe>
+    <h1><img src="/assets/images/controller.png" usemap="#controller-map"/><map id="controller-map" name="controller-map">
         <area href="/input/38" target="post-iframe" shape="rect" coords="34,37,50,51"/>
         <area href="/input/37" target="post-iframe" shape="rect" coords="17,53,31,69"/>
         <area href="/input/40" target="post-iframe" shape="rect" coords="33,73,49,85"/>
@@ -16,9 +14,19 @@
         <area href="/input/17" target="post-iframe" shape="rect" coords="86,66,113,82"/>
         <area href="/input/13" target="post-iframe" shape="rect" coords="122,65,149,82"/>
         <area href="/input/89" target="post-iframe" shape="rect" coords="166,60,192,87"/>
-        <area href="/input/88" target="post-iframe" shape="rect" coords="199,59,225,87"/></map></section>
-    <section class="hidden-stuff">
-      <iframe name="post-iframe" scrolling="no"></iframe>
-    </section>
+        <area href="/input/88" target="post-iframe" shape="rect" coords="199,59,225,87"/></map></h1>
+    <iframe name="post-iframe" scrolling="no" width="0" height="0"></iframe>
+    <h2>Screen</h2>If screen changes without your interaction, don't be afraid! It means that someone
+    else in the world is playing together with you. If you ar curious how many you play together
+    with, just look in the top-left corner.
+    <h2>Controller</h2>Just press the any of the buttons on the controller to interact with the game, just like you would
+    do if you had the controller in your hand.
+    <ul>
+      <li>ARROWS - move the character</li>
+      <li>SELECT - pause/unpause the game, menu selection</li>
+      <li>START  - menu</li>
+      <li>A/B  - action buttons</li>
+    </ul>
+    <h1></h1><a href="/">Go back</a>
   </body>
 </html>
