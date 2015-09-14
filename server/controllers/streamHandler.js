@@ -6,14 +6,13 @@ var exports = {},
     crypto = require('crypto');
 
 module.exports = function(JSNES, activeUsers) {
-  var timeout = null,
+  var interval = null,
       isStreaming = false,
       stream,
       lastRenderedFrameHash = '';
 
   function saveFrame(ms) {
     var canvas = JSNES.ui.screen[0],
-    //var pngStream = JSNES.ui.screen[0].pngStream(),
         hash = crypto.createHash('md5');
 
     var ctx = canvas.getContext('2d');
@@ -38,9 +37,6 @@ module.exports = function(JSNES, activeUsers) {
         lastRenderedFrameHash = newFrameHash;
       }
 
-      timeout = setTimeout(function(){
-        saveFrame(ms);
-      }, ms);
     });
   }
 
@@ -48,13 +44,13 @@ module.exports = function(JSNES, activeUsers) {
     if(isStreaming) return;
 
     isStreaming = true;
-    timeout = setTimeout(function(){
-        saveFrame(ms);
+    interval = setInterval(function(){
+        saveFrame(0);
       }, ms);
   }
 
   exports.stopStream = function() {
-    clearTimeout(timeout);
+    clearInterval(interval);
     isStreaming = false;
   }
 

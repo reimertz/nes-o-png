@@ -11,18 +11,21 @@ var keyMaps = {
 
 module.exports = function(JSNES) {
   return function(req, res, next) {
-    res.end();
-
     var buttonCode = parseInt(req.params.code);
 
-    if(keyMaps[buttonCode]) return;
+    res.end();
 
-    JSNES.keyboard.setKey(buttonCode, 0x41);
-    keyMaps[buttonCode] = true;
+    if(!buttonCode in keyMaps) return;
 
-    setTimeout(function(){
-      JSNES.keyboard.setKey(buttonCode, 0x40);
+    if(!keyMaps[buttonCode]) {
+      JSNES.keyboard.setKey(buttonCode, 0x41);
+    }
+
+    clearTimeout(keyMaps[buttonCode]);
+
+    keyMaps[buttonCode] = setTimeout(function() {
       keyMaps[buttonCode] = false;
-    }, 100);
+      JSNES.keyboard.setKey(buttonCode, 0x40);
+    }, 200);
   }
 }
